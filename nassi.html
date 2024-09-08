@@ -30,7 +30,16 @@ td { text-align:justify;border:solid 1px #eee; }
     font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
 }
 .codeArea {
+  
     white-space: nowrap;displayxx:block;text-alignxx:center;background-color:#8f8;vertical-align:middle;
+}
+
+.addButton {
+    background-image: url( 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="40" height="60"> <path d="M 20 0 l 0 60 M 20 10 q 20 0 20 20 q 0 20 -20 20 q -20 0 -20 -20 q 0 -20 20 -20" style="stroke:rgb(0,0,0);stroke-width:1.75;fill:none;" />  <circle cx="20" cy="30" r="20" fill="green" /> </svg>'     );
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+    border:none;
 }
 
 </style>
@@ -56,6 +65,14 @@ function createDivTextArea(codeLines,label){
     div.style.display="block";
     div.style.lineHeight=0;
     return div;
+}
+
+function createAddButton(){
+    let but1=createElement("BUTTON","");
+    but1.classList.add("addButton");
+    but1.style.width="20px";
+    but1.style.height="20px";
+    return but1;
 }
 
 // tipologie di oggetti: block (code) , if (expr,then, else) , while(expr,loop)
@@ -106,12 +123,10 @@ function renderProgram(container,program){
         let div3=createDiv("");
         div3.classList.add('functionBody');
         for (let b of program.body){
-            let but1=createElement("BUTTON","+");
-            div3.appendChild(but1);
+            div3.appendChild(createAddButton());
             renderProgram(div3,b);
         }
-        let but1=createElement("BUTTON","+");
-        div3.appendChild(but1);
+        div3.appendChild(createAddButton());
         container.appendChild(div3);
         let div4=createDiv(`return: <input type=text value=${program.return}>`);
         div4.classList.add('functionEntry');
@@ -148,24 +163,20 @@ function renderProgram(container,program){
         div4.classList.add('functionBody');
         //div3.style.display="inline-block";
         for (let b of program.then){
-            let but1=createElement("BUTTON","+");
-            div4.appendChild(but1);
+            div4.appendChild(createAddButton());
             renderProgram(div4,b);
         }
-        but1=createElement("BUTTON","+");
-        div4.appendChild(but1);
+        div4.appendChild(createAddButton());
         row3.appendChild(div4);
 
         let div5=createElement("TD","");
         div5.classList.add('functionBody');
         //div3.style.display="inline-block";
         for (let b of program.else){
-            let but1=createElement("BUTTON","+");
-            div5.appendChild(but1);
+            div5.appendChild(createAddButton());
             renderProgram(div5,b);
         }
-        but1=createElement("BUTTON","+");
-        div5.appendChild(but1);
+        div5.appendChild(createAddButton());
         row3.appendChild(div5);
 
         container.appendChild(table);
@@ -190,12 +201,10 @@ function renderProgram(container,program){
         div3.classList.add('functionBody');
         //div3.style.display="inline-block";
         for (let b of program.loop){
-            let but1=createElement("BUTTON","+");
-            div3.appendChild(but1);
+            div3.appendChild(createAddButton());
             renderProgram(div3,b);
         }
-        let but1=createElement("BUTTON","+");
-        div3.appendChild(but1);
+        div3.appendChild(createAddButton());
         row2.appendChild(div3);
         container.appendChild(table);
     }
