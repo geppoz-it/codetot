@@ -5,120 +5,11 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1" name="viewport">
 <style>
-
-@font-face { font-family: myDelius; src: url('https://www.geppoz.eu/fonts/MyDelius-Regular.otf');}
-@font-face { font-family: JetBrainsMono; src: url('https://www.geppoz.eu/fonts/JetBrainsMonoNL-Light.ttf');}
-
-body,input,td { font-family:myDelius; font-size:16px; }
-textarea { font-family:JetBrainsMono; }
-
-body { background:#ddd; }
-table { border:solid 1px #eee;background:#fff; }
-td { text-align:justify;border:solid 1px #eee; }
-
-
-.functionEntry {
-    font-family:JetBrainsMono;background-color:#8f8;border:solid 5pt #f00;border-radius: 15pt;text-align:center;
-}
-.functionBody {
-    font-family:JetBrainsMono;background-color:#eee;widthxx:80%;text-align:center;margin:auto;
-    border-left: 2px solid black;
-    border-right: 2px solid black;
-}
-.whileExpression {
-    font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
-}
-.whileBar {
-    font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
-}
-.codeArea {
-  
-    white-space: nowrap;displayxx:block;text-alignxx:center;background-color:#8f8;vertical-align:middle;
-}
-
-.addButton {
-    background-image: url( 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="40" height="60"> <path d="M 20 0 l 0 60 M 20 10 q 20 0 20 20 q 0 20 -20 20 q -20 0 -20 -20 q 0 -20 20 -20" style="stroke:rgb(0,0,0);stroke-width:1.75;fill:none;" />  <circle cx="20" cy="30" r="20" fill="green" /> </svg>'     );
-    background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
-    border:none;
-}
-
+body,input,textarea { font-family:"Noto Serif","Roboto Slab",serif; }
 </style>
 <script>
 
 function createDiv(text){ var td=document.createElement("DIV");td.innerHTML=text;return td; }
-function createElement(tag,text){ var td=document.createElement(tag);td.innerHTML=text;return td; }
-
-// div con dentro textarea per blocco codice (o espressione)
-function createDivTextArea(code,label){
-    var div=document.createElement("DIV");
-    if (label){
-        let span=createElement("SPAN",label);
-        span.style.verticalAlign="middle";
-        div.appendChild(span);
-    }
-    var ta=document.createElement("TEXTAREA");
-    ta.classList.add('codeArea');
-    ta.value=code;
-    console.log(code);
-    ta.rows=code.split("\n").length||1;
-    ta.addEventListener("input",(e)=>{textAreaEdited(e.target)});
-    div.appendChild(ta);
-    div.style.display="block";
-    div.style.lineHeight=0;
-    return div;
-}
-
-function createAddButton(){
-    let but1=createElement("BUTTON","");
-    but1.classList.add("addButton");
-    but1.style.width="20px";
-    but1.style.height="20px";
-    but1.addEventListener("mousedown",(e)=>{downOnAddButton(e);})
-    but1.addEventListener("mouseup",(e)=>{upOnAddButton(e);})
-    return but1;
-}
-
-function textAreaEdited(ta){
-    console.log(ta.parentNode);
-    let parent=ta.parentNode;
-    let path=parent.getAttribute("data-path");
-    if (path){
-        path=path.split(",");
-        let o=program;for (let x of path) o=o[x];
-        o.code=ta.value;
-    }
-    redimTextarea(ta);
-}
-
-
-let buttonPressed=null;
-function downOnAddButton(e){
-    console.log(e);
-    buttonPressed=e.target;
-}
-function upOnAddButton(e){
-    console.log(e);
-    if (buttonPressed==e.target){ // clicked
-        console.log(buttonPressed);
-        let par=buttonPressed.parentNode;
-        let path=par.getAttribute("data-path");
-        if (path){
-            path=path.split(",");
-            let position=Array.from(par.childNodes).indexOf(buttonPressed)/2;
-            let o=program;for (let x of path) o=o[x]; // array dei block
-            // crea un block
-            o.splice(position,0,{type:"block",code:""});
-            par.innerHTML="";
-            renderProgram(par,o,path);
-            console.log(path,position,o);
-        }
-    } else {
-
-    }
-    buttonPressed=null;
-}
 
 // tipologie di oggetti: block (code) , if (expr,then, else) , while(expr,loop)
 
@@ -137,156 +28,43 @@ let program={
     body:[
         {
             type:"block",
-            code:"s:0\ni:1"
+            code:["s:0","i:1"]
         },
         {
             type:"while",
             expr:"i<=n",
             loop:[{
                 type:"block",
-                code:"s:s+i"
+                code:["s:s+i"]
             }]
-        },
-        {
-            type:"if",
-            expr:"s%0==0",
-            then:[{
-                type:"block",
-                code:"s:s*2"
-            }],
-            else:[]
         }
     ],
-    return: "s"
+    return: "n"
 }
 
-function renderProgram(container,programObj,path){
-    if (programObj.type=="function"){
-        let div1=createDiv(`funct <input type=text value=${programObj.name}>(<input type=text value=${programObj.inputs}>)`);
-        div1.classList.add('functionEntry');
+function renderProgram(container,program){
+    if (program.type=="function"){
+        let div1=createDiv(program.name);
+        let div2=createDiv(program.inputs);
+        let div3=createDiv("temp");
+        let div4=createDiv(program.return);
         container.appendChild(div1);
-        let div3=createDiv("");
-        div3.classList.add('functionBody');
-        div3.setAttribute("data-path",[...path,"body"]);
-        for (let i=0;i<programObj.body.length;i++){
-            let b=programObj.body[i];
-            div3.appendChild(createAddButton());
-            renderProgram(div3,b,[...path,"body",i]);
-        }
-        div3.appendChild(createAddButton());
+        container.appendChild(div2);
         container.appendChild(div3);
-        let div4=createDiv(`return: <input type=text value=${programObj.return}>`);
-        div4.classList.add('functionEntry');
         container.appendChild(div4);
-    } else if (programObj.type=="block"){
-        let div3=createDivTextArea(programObj.code);
-        div3.setAttribute("data-path",path.join(","));
-        container.appendChild(div3);
-    } else if (programObj.type=="if"){
-        let table=createElement("TABLE","");
-        table.style.margin="auto";
-        table.setAttribute("data-path",path.join(","));
-
-        let row1=createElement("TR","");
-        table.appendChild(row1);
-        let td=createElement("TD","");
-        let div1=createDivTextArea(programObj.expr,"if: ");
-        td.appendChild(div1);
-        td.classList.add('whileExpression');
-        td.colSpan=2;
-        row1.appendChild(td);
-
-        let row2=createElement("TR","");
-        table.appendChild(row2);
-        let div2=createElement("TD","then");
-        div2.classList.add('whileBar');
-        div2.style.textAlign="left";
-        row2.appendChild(div2);
-        let div3=createElement("TD","else");
-        div3.classList.add('whileBar');
-        div3.style.textAlign="right";
-        row2.appendChild(div3);
-
-        let row3=createElement("TR","");
-        table.appendChild(row3);
-        let div4=createElement("TD","");
-        div4.classList.add('functionBody');
-        div4.setAttribute("data-path",[...path,"then"].join(","));
-        //div3.style.display="inline-block";
-        for (let i=0;i<programObj.then.length;i++){
-            let b=programObj.then[i];
-            div4.appendChild(createAddButton());
-            renderProgram(div4,b,[...path,"then",i]);
-        }
-        div4.appendChild(createAddButton());
-        row3.appendChild(div4);
-
-        let div5=createElement("TD","");
-        div5.classList.add('functionBody');
-        div5.setAttribute("data-path",[...path,"else"].join(","));
-        //div3.style.display="inline-block";
-        for (let i=0;i<programObj.else.length;i++){
-            let b=programObj.else[i];
-            div5.appendChild(createAddButton());
-            renderProgram(div5,b,[...path,"else",i]);
-        }
-        div5.appendChild(createAddButton());
-        row3.appendChild(div5);
-
-        container.appendChild(table);
-    } else if (programObj.type=="while"){
-        let table=createElement("TABLE","");
-        table.style.margin="auto";
-        table.setAttribute("data-path",path.join(","));
-        let row1=createElement("TR","");
-        table.appendChild(row1);
-        let td=createElement("TD","");
-        let div1=createDivTextArea(programObj.expr,"while: ");
-        td.appendChild(div1);
-        td.classList.add('whileExpression');
-        td.colSpan=2;
-        row1.appendChild(td);
-
-        let row2=createElement("TR","");
-        table.appendChild(row2);
-        let div2=createElement("TD","|");
-        div2.classList.add('whileBar');
-        row2.appendChild(div2);
-        let div3=createElement("TD","");
-        div3.classList.add('functionBody');
-        //div3.style.display="inline-block";
-        for (let i=0;i<programObj.loop.length;i++){
-            let b=programObj.loop[i];
-            div3.appendChild(createAddButton());
-            renderProgram(div3,b,[...path,"loop",i]);
-        }
-        div3.appendChild(createAddButton());
-        row2.appendChild(div3);
-        container.appendChild(table);
     }
 }
 
-function redimAllTextareas(){
-    for (let e of Array.from(document.querySelectorAll("textarea"))) redimTextarea(e);
-}
-function redimTextarea(e){
-    e.style.height="";
-    e.rows=e.value.split("\n").length;
-    e.style.width="";
-    e.cols=e.value.split("\n").reduce((a,x)=>(x.length>a?x.length:a),10)+2;
-}
+
+
 
 </script>
 </head>
 <body>
 
-<div id="mainContainer" style="text-align:center;position:relative;display:inline-table">
+<div id="mainContainer">
     
 </div>
 
-<script>
-    renderProgram(document.getElementById("mainContainer"),program,[]);
-
-</script>
 </body>
 </html>
