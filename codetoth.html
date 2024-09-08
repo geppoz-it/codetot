@@ -19,6 +19,7 @@ td { text-align:justify;border:solid 1px #eee; }
 
 .functionEntry {
     font-family:JetBrainsMono;background-color:#8f8;border:solid 5pt #f00;border-radius: 15pt;text-align:center;
+    padding: 0 10px 0 10px;
 }
 .functionBody {
     font-family:JetBrainsMono;background-color:#eee;widthxx:80%;text-align:center;margin:auto;
@@ -43,6 +44,21 @@ td { text-align:justify;border:solid 1px #eee; }
     border:none;
 }
 
+.thenCell {
+    font-family:JetBrainsMono;
+    background-color:#8f8;text-align:center;margin:auto;
+    background-image: url( 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="10" height="10"> <path d="M 0 0 l 10 10" style="stroke:rgb(0,0,0);stroke-width:2;fill:none;" vector-effect="non-scaling-stroke" /></svg>'     );
+    background-size:100% 100%;
+    background-repeat: no-repeat;
+}
+.elseCell {
+    font-family:JetBrainsMono;
+    background-color:#8f8;text-align:center;margin:auto;
+    background-image: url( 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="10" height="10"> <path d="M 10 0 l -10 10" style="stroke:rgb(0,0,0);stroke-width:2;fill:none;" vector-effect="non-scaling-stroke" /></svg>'     );
+    background-size:100% 100%;
+    background-repeat: no-repeat;
+}
+
 .menuButton {
     background-color: white;
     border:2px solid black;
@@ -53,6 +69,8 @@ td { text-align:justify;border:solid 1px #eee; }
 
 </style>
 <script>
+
+const ifStyle=1; // 0=(inserisce le linee diagonali) 1=(inserisce le parole "then" e "else")
 
 function createDiv(text){ var td=document.createElement("DIV");td.innerHTML=text;return td; }
 function createElement(tag,text){ var td=document.createElement(tag);td.innerHTML=text;return td; }
@@ -149,6 +167,7 @@ function addElementAtButton(but,type){
         document.getElementById("addButtons").style.display="none";
         par.innerHTML="";
         renderProgram(par,o,path);
+        for (let e of Array.from(par.querySelectorAll("textarea"))) redimTextarea(e);
         console.log(path,position,o);
     }
 }
@@ -217,6 +236,7 @@ function renderProgram(container,programObj,path){
     } else if (programObj.type=="if"){
         let table=createElement("TABLE","");
         table.style.margin="auto";
+        table.style.borderCollapse="collapse";
         table.setAttribute("data-path",path.join(","));
 
         let row1=createElement("TR","");
@@ -230,14 +250,22 @@ function renderProgram(container,programObj,path){
 
         let row2=createElement("TR","");
         table.appendChild(row2);
-        let div2=createElement("TD","then");
-        div2.classList.add('whileBar');
-        div2.style.textAlign="left";
-        div2.style.borderRight="2px solid black";
+        let div2=createElement("TD",(ifStyle==0?"&nbsp;":"then"));
+        if (ifStyle==0){
+            div2.classList.add('thenCell');
+        } else {
+            div2.style.textAlign="left";
+            div2.style.borderRight="2px solid black";
+            div2.classList.add('whileBar');
+        }
         row2.appendChild(div2);
-        let div3=createElement("TD","else");
-        div3.classList.add('whileBar');
-        div3.style.textAlign="right";
+        let div3=createElement("TD",(ifStyle==0?"&nbsp;":"else"));
+        if (ifStyle==0){
+            div3.classList.add('elseCell');
+        } else {
+            div3.style.textAlign="right";
+            div3.classList.add('whileBar');
+        }
         row2.appendChild(div3);
 
         let row3=createElement("TR","");
@@ -259,6 +287,7 @@ function renderProgram(container,programObj,path){
     } else if (programObj.type=="while"){
         let table=createElement("TABLE","");
         table.style.margin="auto";
+        table.style.borderCollapse="collapse";
         table.setAttribute("data-path",path.join(","));
         let row1=createElement("TR","");
         table.appendChild(row1);
@@ -309,7 +338,7 @@ function redimTextarea(e){
 </head>
 <body>
 
-<div id="mainContainer" style="text-align:center;position:relative;display:inline-table">
+<div id="mainContainer" style="text-align:center;position:relative;top:50px;left:50px;display:inline-table">
     
 </div>
 
