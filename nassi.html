@@ -21,7 +21,9 @@ td { text-align:justify;border:solid 1px #eee; }
     font-family:JetBrainsMono;background-color:#8f8;border:solid 5pt #f00;border-radius: 15pt;text-align:center;
 }
 .functionBody {
-    font-family:JetBrainsMono;background-color:#eee;widthxx:80%;text-align:center;margin:auto;border: 1px solid black;
+    font-family:JetBrainsMono;background-color:#eee;widthxx:80%;text-align:center;margin:auto;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
 }
 .whileExpression {
     font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
@@ -73,6 +75,8 @@ function createAddButton(){
     but1.classList.add("addButton");
     but1.style.width="20px";
     but1.style.height="20px";
+    but1.addEventListener("mousedown",(e)=>{downOnAddButton(e);})
+    but1.addEventListener("mouseup",(e)=>{upOnAddButton(e);})
     return but1;
 }
 
@@ -82,12 +86,37 @@ function textAreaEdited(ta){
     let path=parent.getAttribute("data-path");
     if (path){
         path=path.split(",");
-        let o=program;for (let x of path) o=o[x]
+        let o=program;for (let x of path) o=o[x];
         o.code=ta.value;
     }
     redimTextarea(ta);
 }
 
+
+let buttonPressed=null;
+function downOnAddButton(e){
+    console.log(e);
+    buttonPressed=e.target;
+}
+function upOnAddButton(e){
+    console.log(e);
+    if (buttonPressed==e.target){ // clicked
+        console.log(buttonPressed);
+        let path=buttonPressed.parentNode.getAttribute("data-path");
+        if (path){
+            path=path.split(",");
+            let position=Array.from(buttonPressed.parentNode.childNodes).indexOf(buttonPressed)/2;
+            let o=program;for (let x of path) o=o[x]; // array dei block
+            // crea un block
+            o.splice(position,0,{type:"block",code:""});
+            renderProgram(document.getElementById("mainContainer"),program,[]);
+            console.log(path,position,o);
+        }
+    } else {
+
+    }
+    buttonPressed=null;
+}
 
 // tipologie di oggetti: block (code) , if (expr,then, else) , while(expr,loop)
 
@@ -180,6 +209,7 @@ function renderProgram(container,programObj,path){
         table.appendChild(row3);
         let div4=createElement("TD","");
         div4.classList.add('functionBody');
+        div4.setAttribute("data-path",[...path,"then"].join(","));
         //div3.style.display="inline-block";
         for (let i=0;i<programObj.then.length;i++){
             let b=programObj.then[i];
@@ -191,6 +221,7 @@ function renderProgram(container,programObj,path){
 
         let div5=createElement("TD","");
         div5.classList.add('functionBody');
+        div5.setAttribute("data-path",[...path,"else"].join(","));
         //div3.style.display="inline-block";
         for (let i=0;i<programObj.else.length;i++){
             let b=programObj.else[i];
