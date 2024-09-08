@@ -30,7 +30,7 @@ td { text-align:justify;border:solid 1px #eee; }
     font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
 }
 .codeArea {
-    white-space: nowrap;displayxx:block;text-alignxx:center;background-color:#8f8;vertical-align:center;
+    white-space: nowrap;displayxx:block;text-alignxx:center;background-color:#8f8;vertical-align:middle;
 }
 
 </style>
@@ -42,6 +42,11 @@ function createElement(tag,text){ var td=document.createElement(tag);td.innerHTM
 // div con dentro textarea per blocco codice (o espressione)
 function createDivTextArea(codeLines,label){
     var div=document.createElement("DIV");
+    if (label){
+        let span=createElement("SPAN",label);
+        span.style.verticalAlign="middle";
+        div.appendChild(span);
+    }
     var ta=document.createElement("TEXTAREA");
     ta.classList.add('codeArea');
     ta.value=codeLines.join("\n");
@@ -118,10 +123,12 @@ function renderProgram(container,program){
         table.style.margin="auto";
         let row1=createElement("TR","");
         table.appendChild(row1);
-        let div1=createElement("TD",`if: <input type=text value=${program.expr}>`);
-        div1.classList.add('whileExpression');
-        div1.colSpan=2;
-        row1.appendChild(div1);
+        let td=createElement("TD","");
+        let div1=createDivTextArea([program.expr],"if: ");
+        td.appendChild(div1);
+        td.classList.add('whileExpression');
+        td.colSpan=2;
+        row1.appendChild(td);
 
         let row2=createElement("TR","");
         table.appendChild(row2);
@@ -166,10 +173,12 @@ function renderProgram(container,program){
         table.style.margin="auto";
         let row1=createElement("TR","");
         table.appendChild(row1);
-        let div1=createElement("TD",`while: <input type=text value=${program.expr}>`);
-        div1.classList.add('whileExpression');
-        div1.colSpan=2;
-        row1.appendChild(div1);
+        let td=createElement("TD","");
+        let div1=createDivTextArea([program.expr],"while: ");
+        td.appendChild(div1);
+        td.classList.add('whileExpression');
+        td.colSpan=2;
+        row1.appendChild(td);
 
         let row2=createElement("TR","");
         table.appendChild(row2);
