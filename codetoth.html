@@ -86,9 +86,10 @@ function createDivTextArea(code,label,labelAfter){
     var ta=document.createElement("TEXTAREA");
     ta.classList.add('codeArea');
     ta.value=code;
-    console.log(code);
+    //console.log(code);
     ta.rows=code.split("\n").length||1;
     ta.addEventListener("input",(e)=>{textAreaEdited(e.target)});
+    //ta.addEventListener("mousedown",(e)=>{textAreaMouseDown(e)});
     div.appendChild(ta);
     if (labelAfter){
         let span=createElement("SPAN",labelAfter);
@@ -121,6 +122,11 @@ function textAreaEdited(ta){
     }
     redimTextarea(ta);
 }
+
+/*function textAreaMouseDown(e){
+    console.log("mousedown on:",e);
+    e.preventDefault();
+}*/
 
 let lastSelected=null; // ultimo oggetto su cui si è interagito (es. click su button)
 
@@ -213,7 +219,7 @@ let program={
 }
 
 function renderProgram(container,programObj,path){
-    console.log(container,programObj,path);
+    //console.log(container,programObj,path);
     if (programObj.type=="function"){
         let div0=createDivTextArea(programObj.name,"funct: ");
         div0.classList.add('functionEntry');
@@ -229,6 +235,7 @@ function renderProgram(container,programObj,path){
         let div4=createDivTextArea(programObj.return,"return: ");
         div4.classList.add('functionEntry');
         container.appendChild(div4);
+        container.style.userSelect = 'none';
     } else if (programObj.type=="block"){
         let div3=createDivTextArea(programObj.code);
         div3.setAttribute("data-path",path.join(","));
@@ -242,6 +249,7 @@ function renderProgram(container,programObj,path){
         let row1=createElement("TR","");
         table.appendChild(row1);
         let td=createElement("TD","");
+        td.style.userSelect = 'none';
         let div1=createDivTextArea(programObj.expr,"if: ");
         td.appendChild(div1);
         td.classList.add('whileExpression');
@@ -251,6 +259,7 @@ function renderProgram(container,programObj,path){
         let row2=createElement("TR","");
         table.appendChild(row2);
         let div2=createElement("TD",(ifStyle==0?"&nbsp;":"then"));
+        div2.style.userSelect = 'none';
         if (ifStyle==0){
             div2.classList.add('thenCell');
         } else {
@@ -260,6 +269,7 @@ function renderProgram(container,programObj,path){
         }
         row2.appendChild(div2);
         let div3=createElement("TD",(ifStyle==0?"&nbsp;":"else"));
+        div3.style.userSelect = 'none';
         if (ifStyle==0){
             div3.classList.add('elseCell');
         } else {
@@ -292,6 +302,7 @@ function renderProgram(container,programObj,path){
         let row1=createElement("TR","");
         table.appendChild(row1);
         let td=createElement("TD","");
+        td.style.userSelect = 'none';
         let div1=createDivTextArea(programObj.expr,"while: ");
         td.appendChild(div1);
         td.classList.add('whileExpression');
