@@ -18,16 +18,19 @@ td { text-align:justify;border:solid 1px #eee; }
 
 
 .functionEntry {
-    border:solid 5pt #f00;border-radius: 15pt;text-align:center;
+    font-family:JetBrainsMono;border:solid 5pt #f00;border-radius: 15pt;text-align:center;
 }
 .functionBody {
-    background-color:#88f;width:80%;text-align:center;margin:auto;
+    font-family:JetBrainsMono;background-color:#88f;widthxx:80%;text-align:center;margin:auto;border: 1px solid black;
 }
 .whileExpression {
-    background-color:#8f8;text-align:center;margin:auto;
+    font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
 }
 .whileBar {
-    background-color:#8f8;text-align:center;margin:auto;
+    font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
+}
+.codeArea {
+    white-space: nowrap;display:block;text-align:center;
 }
 
 </style>
@@ -62,6 +65,15 @@ let program={
                 type:"block",
                 code:["s:s+i"]
             }]
+        },
+        {
+            type:"if",
+            expr:"s%0==0",
+            then:[{
+                type:"block",
+                code:["s:s*2"]
+            }],
+            else:[]
         }
     ],
     return: "s"
@@ -75,27 +87,81 @@ function renderProgram(container,program){
         let div3=createDiv("");
         div3.classList.add('functionBody');
         for (let b of program.body){
+            let but1=createElement("BUTTON","+");
+            div3.appendChild(but1);
             renderProgram(div3,b);
         }
+        let but1=createElement("BUTTON","+");
+        div3.appendChild(but1);
         container.appendChild(div3);
         let div4=createDiv(`return: <input type=text value=${program.return}>`);
         div4.classList.add('functionEntry');
         container.appendChild(div4);
     } else if (program.type=="block"){
-        let div3=createDiv(program.code.join("<br>"));
-        div3.classList.add('functionBody');
+        let div3=createElement("TEXTAREA","");
+        div3.classList.add('codeArea');
+        div3.value=program.code.join("\n");
         container.appendChild(div3);
+    } else if (program.type=="if"){
+        let table=createElement("TABLE","");
+        table.style.width="100%";
+        let row1=createElement("TR","");
+        table.appendChild(row1);
+        let div1=createElement("TD",`if: <input type=text value=${program.expr}>`);
+        div1.classList.add('whileExpression');
+        div1.colSpan=2;
+        row1.appendChild(div1);
+
+        let row2=createElement("TR","");
+        table.appendChild(row2);
+        let div2=createElement("TD","then");
+        div2.classList.add('whileBar');
+        div2.style.textAlign="left";
+        row2.appendChild(div2);
+        let div3=createElement("TD","else");
+        div3.classList.add('whileBar');
+        div3.style.textAlign="right";
+        row2.appendChild(div3);
+
+        let row3=createElement("TR","");
+        table.appendChild(row3);
+        let div4=createElement("TD","");
+        div4.classList.add('functionBody');
+        //div3.style.display="inline-block";
+        for (let b of program.then){
+            let but1=createElement("BUTTON","+");
+            div4.appendChild(but1);
+            renderProgram(div4,b);
+        }
+        but1=createElement("BUTTON","+");
+        div4.appendChild(but1);
+        row3.appendChild(div4);
+
+        let div5=createElement("TD","");
+        div5.classList.add('functionBody');
+        //div3.style.display="inline-block";
+        for (let b of program.else){
+            let but1=createElement("BUTTON","+");
+            div5.appendChild(but1);
+            renderProgram(div5,b);
+        }
+        but1=createElement("BUTTON","+");
+        div5.appendChild(but1);
+        row3.appendChild(div5);
+
+        container.appendChild(table);
     } else if (program.type=="while"){
         let table=createElement("TABLE","");
         table.style.width="100%";
         let row1=createElement("TR","");
         table.appendChild(row1);
-        let row2=createElement("TR","");
-        table.appendChild(row2);
         let div1=createElement("TD",`while: <input type=text value=${program.expr}>`);
         div1.classList.add('whileExpression');
         div1.colSpan=2;
         row1.appendChild(div1);
+
+        let row2=createElement("TR","");
+        table.appendChild(row2);
         let div2=createElement("TD","|");
         div2.classList.add('whileBar');
         row2.appendChild(div2);
@@ -103,23 +169,30 @@ function renderProgram(container,program){
         div3.classList.add('functionBody');
         //div3.style.display="inline-block";
         for (let b of program.loop){
+            let but1=createElement("BUTTON","+");
+            div3.appendChild(but1);
             renderProgram(div3,b);
         }
+        let but1=createElement("BUTTON","+");
+        div3.appendChild(but1);
         row2.appendChild(div3);
         container.appendChild(table);
     }
 }
 
-// renderProgram(document.getElementById("mainContainer"),program);
 
 
 </script>
 </head>
 <body>
 
-<div id="mainContainer" style="background-color: #ff0;text-align:center;">
+<div id="mainContainer" style="background-color: #ff0;text-align:center;position:absolute;">
     
 </div>
 
+<script>
+    renderProgram(document.getElementById("mainContainer"),program);
+
+</script>
 </body>
 </html>
