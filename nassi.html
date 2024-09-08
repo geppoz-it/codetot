@@ -49,7 +49,7 @@ function createDiv(text){ var td=document.createElement("DIV");td.innerHTML=text
 function createElement(tag,text){ var td=document.createElement(tag);td.innerHTML=text;return td; }
 
 // div con dentro textarea per blocco codice (o espressione)
-function createDivTextArea(codeLines,label){
+function createDivTextArea(code,label){
     var div=document.createElement("DIV");
     if (label){
         let span=createElement("SPAN",label);
@@ -58,9 +58,10 @@ function createDivTextArea(codeLines,label){
     }
     var ta=document.createElement("TEXTAREA");
     ta.classList.add('codeArea');
-    ta.value=codeLines.join("\n");
-    ta.rows=codeLines.length||1;
-    ta.addEventListener("input",(e)=>{redimTextarea(e.target)});
+    ta.value=code;
+    console.log(code);
+    ta.rows=code.split("\n").length||1;
+    ta.addEventListener("input",(e)=>{textAreaEdited(e.target)});
     div.appendChild(ta);
     div.style.display="block";
     div.style.lineHeight=0;
@@ -74,6 +75,19 @@ function createAddButton(){
     but1.style.height="20px";
     return but1;
 }
+
+function textAreaEdited(ta){
+    console.log(ta.parentNode);
+    let parent=ta.parentNode;
+    let path=parent.getAttribute("data-path");
+    if (path){
+        path=path.split(",");
+        let o=program;for (let x of path) o=o[x]
+        o.code=ta.value;
+    }
+    redimTextarea(ta);
+}
+
 
 // tipologie di oggetti: block (code) , if (expr,then, else) , while(expr,loop)
 
@@ -92,14 +106,14 @@ let program={
     body:[
         {
             type:"block",
-            code:["s:0","i:1"]
+            code:"s:0\ni:1"
         },
         {
             type:"while",
             expr:"i<=n",
             loop:[{
                 type:"block",
-                code:["s:s+i"]
+                code:"s:s+i"
             }]
         },
         {
@@ -107,7 +121,7 @@ let program={
             expr:"s%0==0",
             then:[{
                 type:"block",
-                code:["s:s*2"]
+                code:"s:s*2"
             }],
             else:[]
         }
@@ -145,7 +159,7 @@ function renderProgram(container,programObj,path){
         let row1=createElement("TR","");
         table.appendChild(row1);
         let td=createElement("TD","");
-        let div1=createDivTextArea([programObj.expr],"if: ");
+        let div1=createDivTextArea(programObj.expr,"if: ");
         td.appendChild(div1);
         td.classList.add('whileExpression');
         td.colSpan=2;
@@ -194,7 +208,7 @@ function renderProgram(container,programObj,path){
         let row1=createElement("TR","");
         table.appendChild(row1);
         let td=createElement("TD","");
-        let div1=createDivTextArea([programObj.expr],"while: ");
+        let div1=createDivTextArea(programObj.expr,"while: ");
         td.appendChild(div1);
         td.classList.add('whileExpression');
         td.colSpan=2;
