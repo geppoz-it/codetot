@@ -51,6 +51,7 @@ function createDivTextArea(codeLines,label){
     ta.classList.add('codeArea');
     ta.value=codeLines.join("\n");
     ta.rows=codeLines.length||1;
+    ta.addEventListener("input",(e)=>{redimTextarea(e.target)});
     div.appendChild(ta);
     div.style.display="block";
     div.style.lineHeight=0;
@@ -200,7 +201,15 @@ function renderProgram(container,program){
     }
 }
 
-
+function redimAllTextareas(){
+    for (let e of Array.from(document.querySelectorAll("textarea"))) redimTextarea(e);
+}
+function redimTextarea(e){
+    e.style.height="";
+    e.rows=e.value.split("\n").length;
+    e.style.width="";
+    e.cols=e.value.split("\n").reduce((a,x)=>(x.length>a?x.length:a),10)+2;
+}
 
 </script>
 </head>
