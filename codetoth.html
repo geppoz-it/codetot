@@ -22,8 +22,8 @@ td { text-align:justify;border:solid 1px #eee; }
 }
 .functionBody {
     font-family:JetBrainsMono;background-color:#eee;widthxx:80%;text-align:center;margin:auto;
-    border-left: 2px solid black;
-    border-right: 2px solid black;
+    border-leftxx: 2px solid black;
+    border-rightxx: 2px solid black;
 }
 .whileExpression {
     font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
@@ -32,7 +32,7 @@ td { text-align:justify;border:solid 1px #eee; }
     font-family:JetBrainsMono;background-color:#8f8;text-align:center;margin:auto;
 }
 .codeArea {
-    white-space: nowrap;background-color:#8f8;vertical-align:middle;
+    white-space: nowrap;background-color:#6d6;vertical-align:middle;
 }
 
 .addButton {
@@ -58,7 +58,7 @@ function createDiv(text){ var td=document.createElement("DIV");td.innerHTML=text
 function createElement(tag,text){ var td=document.createElement(tag);td.innerHTML=text;return td; }
 
 // div con dentro textarea per blocco codice (o espressione)
-function createDivTextArea(code,label){
+function createDivTextArea(code,label,labelAfter){
     var div=document.createElement("DIV");
     if (label){
         let span=createElement("SPAN",label);
@@ -72,6 +72,11 @@ function createDivTextArea(code,label){
     ta.rows=code.split("\n").length||1;
     ta.addEventListener("input",(e)=>{textAreaEdited(e.target)});
     div.appendChild(ta);
+    if (labelAfter){
+        let span=createElement("SPAN",labelAfter);
+        span.style.verticalAlign="middle";
+        div.appendChild(span);
+    }
     div.style.display="block";
     div.style.lineHeight=0;
     return div;
@@ -161,7 +166,7 @@ function addElementAtButton(but,type){
 let program={
     type:"function",
     name:"sommaNumeri",
-    inputs:["n"],
+    inputs:"n",
     body:[
         {
             type:"block",
@@ -191,15 +196,18 @@ let program={
 function renderProgram(container,programObj,path){
     console.log(container,programObj,path);
     if (programObj.type=="function"){
-        let div1=createDiv(`funct <input type=text value=${programObj.name}>(<input type=text value=${programObj.inputs}>)`);
-        div1.classList.add('functionEntry');
-        container.appendChild(div1);
+        let div0=createDivTextArea(programObj.name,"funct: ");
+        div0.classList.add('functionEntry');
+        container.appendChild(div0);
+        let div8=createDivTextArea(programObj.inputs,"(",")");
+        div8.classList.add('functionEntry');
+        container.appendChild(div8);
         let div3=createDiv("");
         div3.classList.add('functionBody');
         div3.setAttribute("data-path",[...path,"body"]);
         renderProgram(div3,programObj.body,[...path,"body"]);
         container.appendChild(div3);
-        let div4=createDiv(`return: <input type=text value=${programObj.return}>`);
+        let div4=createDivTextArea(programObj.return,"return: ");
         div4.classList.add('functionEntry');
         container.appendChild(div4);
     } else if (programObj.type=="block"){
@@ -225,6 +233,7 @@ function renderProgram(container,programObj,path){
         let div2=createElement("TD","then");
         div2.classList.add('whileBar');
         div2.style.textAlign="left";
+        div2.style.borderRight="2px solid black";
         row2.appendChild(div2);
         let div3=createElement("TD","else");
         div3.classList.add('whileBar');
@@ -235,6 +244,7 @@ function renderProgram(container,programObj,path){
         table.appendChild(row3);
         let div4=createElement("TD","");
         div4.classList.add('functionBody');
+        div4.style.borderRight="2px solid black";
         div4.setAttribute("data-path",[...path,"then"].join(","));
         renderProgram(div4,programObj.then,[...path,"then"]);
         row3.appendChild(div4);
@@ -261,8 +271,9 @@ function renderProgram(container,programObj,path){
 
         let row2=createElement("TR","");
         table.appendChild(row2);
-        let div2=createElement("TD","|");
+        let div2=createElement("TD","&nbsp;");
         div2.classList.add('whileBar');
+        div2.style.borderRight="2px solid black";
         row2.appendChild(div2);
         let div3=createElement("TD","");
         div3.classList.add('functionBody');
@@ -302,10 +313,6 @@ function redimTextarea(e){
     
 </div>
 
-<script>
-    renderProgram(document.getElementById("mainContainer"),program,[]);
-
-</script>
 
 <div id="coverLayer" style="position:absolute;overflow:hidden;z-index:1000;text-align: center;opacity:0.5;background-color: white;display: none;top:0px;left:0px;width:100%;height:100%;"></div>
 <div id="addButtons" style="position:absolute;overflow:hidden;z-index:1001;text-align: center;opacity:0.9;background-color: none;display: none;">
@@ -313,6 +320,12 @@ function redimTextarea(e){
     <button class="menuButton" onclick="chooseAdd('if');">if</button>
     <button class="menuButton" onclick="chooseAdd('while');">while</button>
 </div>
+
+
+<script>
+    renderProgram(document.getElementById("mainContainer"),program,[]);
+    redimAllTextareas();
+</script>
 
 </body>
 </html>
